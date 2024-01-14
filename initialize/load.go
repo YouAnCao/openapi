@@ -18,5 +18,6 @@ func LoadConfig() {
 	}
 	if err := viper.Unmarshal(&global.Config); err != nil {
 		fmt.Println("引入配置异常！")
+		return
 	}
 }

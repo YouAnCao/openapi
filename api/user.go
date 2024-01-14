@@ -50,3 +50,19 @@ func (u *User) UserRegister(c *gin.Context) {
 	}
 	repsonse.Fail(-1, "注册失败!", c)
 }
+
+// GetUserInfo 获取用户信息
+func (u *User) GetUserInfo(c *gin.Context) {
+	val, exists := c.Get("username")
+	if !exists {
+		repsonse.Fail(1, "获取用户信息异常!", c)
+		return
+	}
+	username, ok := val.(string)
+	if !ok {
+		repsonse.Fail(2, "获取用户信息异常!", c)
+		return
+	}
+	userInfo := service.GetUserService().GetUserInfo(username)
+	repsonse.Success(userInfo, c)
+}

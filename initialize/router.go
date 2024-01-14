@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"openapi/api"
 	"openapi/global"
+	"openapi/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,10 +18,12 @@ func Router() {
 		c.String(http.StatusNotFound, "not found!")
 	})
 
-	user := engine.Group("/api")
+	openapi := engine.Group("/api")
 	{
-		user.POST("/login", api.GetUser().UserLogin)
-		user.POST("/sign", api.GetUser().UserRegister)
+		openapi.POST("/login", api.GetUser().UserLogin)
+		openapi.POST("/sign", api.GetUser().UserRegister)
+		openapi.Use(middleware.JwtAuth())
+		openapi.GET("/user", api.GetUser().GetUserInfo)
 	}
 
 	engine.Run(fmt.Sprintf("0.0.0.0:%d", global.Config.Server.Port))

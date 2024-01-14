@@ -6,14 +6,12 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
+	"openapi/common"
 	"openapi/constant"
 	"openapi/global"
 	"openapi/modules/user"
 	"strconv"
 	"strings"
-	"time"
-
-	"github.com/google/uuid"
 )
 
 // UserService 用户服务
@@ -25,16 +23,35 @@ func GetUserService() *UserService {
 	return &UserService{}
 }
 
+// GetUserInfo 获取用户信息
+func (s *UserService) GetUserInfo(username string) *user.UserInfo {
+	val, err := global.Rdb.HGet(ctx, constant.RdbUserKey, username).Result()
+	if err != nil {
+		fmt.Println("获取用户信息异常！", err)
+		return nil
+	}
+	var userInfo user.UserInfo
+	err = json.Unmarshal([]byte(val), &userInfo)
+	if err != nil {
+		fmt.Println("读取用户信息失败！", err)
+		return nil
+	}
+	userInfo.Password = ""
+	return &userInfo
+}
+
 // UserLogin 用户登录
 func (s *UserService) UserLogin(u *user.LoginParam) *user.UserToken {
 	val, err := global.Rdb.HGet(ctx, constant.RdbUserKey, u.UserName).Result()
 	if err != nil {
 		fmt.Println("获取用户信息异常！", err)
+		return nil
 	}
 	var userInfo user.UserInfo
-	err2 := json.Unmarshal([]byte(val), &userInfo)
-	if err2 != nil {
-		fmt.Println("读取用户信息失败！", err2)
+	err = json.Unmarshal([]byte(val), &userInfo)
+	if err != nil {
+		fmt.Println("读取用户信息失败！", err)
+		return nil
 	}
 	hash := sha1.New()
 	data := fmt.Sprintf("%s-%s", u.Password, constant.Salt)
@@ -90,12 +107,7 @@ func (s *UserService) UserRegister(u *user.SignParam) *user.UserToken {
 }
 
 func getToken(userInfo *user.UserInfo) *user.UserToken {
-	token := uuid.New().String()
-	timeDuration, err := time.ParseDuration("1h")
-	if err != nil {
-		return nil
-	}
-	global.Rdb.Set(ctx, fmt.Sprintf(constant.RdbUserToken, userInfo.UserName), token, timeDuration)
+	token := common.GeneratorToken(userInfo.UserName)
 	return &user.UserToken{
 		UserID: userInfo.UserID,
 		Token:  token,
