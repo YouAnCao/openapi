@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"openapi/global"
 
+	"os"
+
 	"github.com/spf13/viper"
 )
 
@@ -14,10 +16,12 @@ func LoadConfig() {
 	viper.SetConfigType("yaml")
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Println("读取配置异常！")
+		os.Exit(1)
 		return
 	}
 	if err := viper.Unmarshal(&global.Config); err != nil {
 		fmt.Println("引入配置异常！")
+		os.Exit(1)
 		return
 	}
 }
