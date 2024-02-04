@@ -7,3 +7,9 @@ redis:
   password: 
 jwt:
   signKey: 12345678  
+
+
+mysql:
+  username: root
+  password: 123qweasd!@#
+  url: localhost:3306
