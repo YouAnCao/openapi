@@ -4,5 +4,6 @@ package initialize
 func Run() {
 	LoadConfig()
 	Redis()
+	Mysql()
 	Router()
 }

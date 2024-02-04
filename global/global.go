@@ -4,6 +4,7 @@ import (
 	"openapi/config"
 
 	"github.com/redis/go-redis/v9"
+	"gorm.io/gorm"
 )
 
 var (
@@ -11,4 +12,5 @@ var (
 	Config config.Config
 	// Rdb redis client
 	Rdb *redis.Client
+	Db  *gorm.DB
 )
